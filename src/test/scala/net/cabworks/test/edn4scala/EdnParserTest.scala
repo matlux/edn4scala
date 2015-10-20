@@ -3,23 +3,23 @@ package net.cabworks.test.edn4scala
 import java.util.UUID
 
 import clojure.lang.{Keyword, Symbol}
-import net.cabworks.edn4scala.GistReader.{EdnKeyword, EdnSymbol}
+import net.cabworks.edn4scala.EdnParser.{EdnKeyword, EdnSymbol}
 import org.scalatest.FunSuite
-import net.cabworks.edn4scala.GistReader
+import net.cabworks.edn4scala.EdnParser
 
 import scala.collection.immutable.HashMap
 
 /**
  * Created by cab on 09/10/2015.
  */
-class GistTest extends FunSuite {
+class EdnParserTest extends FunSuite {
   test("Read Edn") {
     assertResult(List(1, 2, 3)) {
-      GistReader.readEdnString("(1 2 3)")
+      EdnParser.readEdnString("(1 2 3)")
     }
   }
 
-  def testEval (str : String) = GistReader.readEdnString(str)
+  def testEval (str : String) = EdnParser.readEdnString(str)
 
   test("integers") {
     assertResult(0){testEval("0")}

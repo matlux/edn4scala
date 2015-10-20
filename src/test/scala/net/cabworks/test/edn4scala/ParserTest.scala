@@ -1,16 +1,16 @@
 package net.cabworks.test.edn4scala
 
 
-import net.cabworks.edn4scala.GistReader.{EdnKeyword, EdnSymbol}
+import net.cabworks.edn4scala.EdnParser.{EdnKeyword, EdnSymbol}
 import org.scalatest.FunSuite
-import net.cabworks.edn4scala.{GistReader}
+import net.cabworks.edn4scala.{EdnParser}
 import java.util.UUID
 /**
  * Created by cab on 03/10/2015.
  */
 
 class ParserTest extends FunSuite{
-  def testParser (str : String) = GistReader.readEdnString(str)
+  def testParser (str : String) = EdnParser.readEdnString(str)
 
   test("integers") {
     assertResult(0){testParser("0")}

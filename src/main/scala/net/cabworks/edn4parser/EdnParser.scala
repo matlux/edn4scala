@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 /**
  * Created by cab on 09/10/2015.
  */
-object GistReader {
+object EdnParser {
   type Expr = Any
 
   sealed trait EdnExpr {
