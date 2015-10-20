@@ -3,6 +3,7 @@ package net.cabworks.edn4scala
 import java.io.StringWriter
 import clojure.lang._
 import scala.collection.JavaConverters._
+
 /**
  * Created by cab on 09/10/2015.
  */
