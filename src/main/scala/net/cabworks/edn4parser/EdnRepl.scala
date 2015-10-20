@@ -19,7 +19,7 @@ object EdnRepl {
           case Success(res) => res
           case Failure(ex) => println(ex.getMessage)
         }
-        println(EdnParser.writeEdnString(result))
+        println(result)
         replLoop
       }
       case _ => ()

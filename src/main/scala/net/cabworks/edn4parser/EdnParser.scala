@@ -55,6 +55,37 @@ object EdnParser {
     def this(ns : String, name : String) = this(ns, name, Map())
   }
 
+  trait EdnSeq extends EdnExpr {
+    def head: Expr
+    def tail: EdnSeq
+  }
+
+  case class EdnList(intern: List[Expr],meta: Map[Expr,Expr]) extends EdnSeq {
+    def mdata = meta
+    override def value = toString
+    override def toString = "Edn_" + intern
+
+    override def head: Expr = intern.head
+
+    override def tail: EdnSeq = EdnList(intern.tail)
+  }
+
+  case class EdnVector(intern: Vector[Expr],meta: Map[Expr,Expr]) extends EdnExpr {
+    def mdata = meta
+    override def value = toString
+    override def toString = "Edn_" + intern
+
+  }
+
+  object EdnList {
+    def apply() = new EdnList(List(), Map())
+    def apply(intern : List[Expr]) = new EdnList(intern,Map())
+  }
+  object EdnVector {
+    def apply() = new EdnVector(Vector(), Map())
+    def apply(intern : Vector[Expr]) = new EdnVector(intern,Map())
+  }
+
   object EdnSymbol {
     def apply(name : String) = new EdnSymbol(name)
     def apply(ns : String, name : String) = new EdnSymbol(ns, name)
@@ -78,8 +109,8 @@ object EdnParser {
   // convertion is deep/recursive.
   def java2scalaRec(expr: Expr): Any = {
     expr match {
-      case _ : clojure.lang.IPersistentVector => expr.asInstanceOf[java.util.List[Expr]].asScala.toVector.map(subexp => java2scalaRec(subexp))
-      case _ : clojure.lang.IPersistentList => expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp))
+      case _ : clojure.lang.IPersistentVector => EdnVector(expr.asInstanceOf[java.util.List[Expr]].asScala.toVector.map(subexp => java2scalaRec(subexp)))
+      case _ : clojure.lang.IPersistentList => EdnList(expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp)))
       case _ : clojure.lang.IPersistentMap => expr.asInstanceOf[java.util.Map[Expr,Expr]].asScala.toMap.map{case (k,v) => (java2scalaRec(k),java2scalaRec(v))}
       case _ : clojure.lang.IPersistentSet => expr.asInstanceOf[java.util.Set[Expr]].asScala.toSet.asInstanceOf[Set[Expr]].map(subexp => java2scalaRec(subexp))
       case _ : java.util.List[Expr @unchecked] => expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp))
