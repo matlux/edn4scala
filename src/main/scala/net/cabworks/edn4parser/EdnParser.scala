@@ -70,11 +70,31 @@ object EdnParser {
     override def tail: EdnSeq = EdnList(intern.tail)
   }
 
-  case class EdnVector(intern: Vector[Expr],meta: Map[Expr,Expr]) extends EdnExpr {
+  case class EdnVector(intern: Vector[Expr],meta: Map[Expr,Expr]) extends EdnSeq {
     def mdata = meta
     override def value = toString
     override def toString = "Edn_" + intern
 
+    override def head: Expr = intern.head
+    override def tail: EdnSeq = EdnVector(intern.tail)
+  }
+
+  case class EdnSet(intern: Set[Expr], meta: Map[Expr, Expr]) extends  EdnSeq {
+    def mdata = meta
+    override def value = toString
+    override def toString = "Edn_" + intern
+
+    override def head: Expr = intern.head
+    override def tail: EdnSeq = EdnSet(intern.tail)
+  }
+
+  case class EdnMap(intern: Map[Expr,Expr], meta: Map[Expr,Expr]) extends EdnSeq {
+    def mdata = meta
+    override def value = toString
+    override def toString = "Edn_" + intern
+
+    override def head: Expr = intern.head
+    override def tail: EdnSeq = EdnMap(intern.tail)
   }
 
   object EdnList {
@@ -85,10 +105,19 @@ object EdnParser {
     def apply() = new EdnVector(Vector(), Map())
     def apply(intern : Vector[Expr]) = new EdnVector(intern,Map())
   }
+  object EdnSet {
+    def apply() = new EdnSet(Set(), Map())
+    def apply(intern: Set[Expr]) = new EdnSet(intern, Map())
+  }
 
   object EdnSymbol {
     def apply(name : String) = new EdnSymbol(name)
     def apply(ns : String, name : String) = new EdnSymbol(ns, name)
+  }
+
+  object EdnMap {
+    def apply() = new EdnMap(Map(), Map())
+    def apply(intern: Map[Expr,Expr]) = new EdnMap(intern, Map())
   }
 
   // converts EDN string into a Scala data structure
@@ -111,9 +140,9 @@ object EdnParser {
     expr match {
       case _ : clojure.lang.IPersistentVector => EdnVector(expr.asInstanceOf[java.util.List[Expr]].asScala.toVector.map(subexp => java2scalaRec(subexp)))
       case _ : clojure.lang.IPersistentList => EdnList(expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp)))
-      case _ : clojure.lang.IPersistentMap => expr.asInstanceOf[java.util.Map[Expr,Expr]].asScala.toMap.map{case (k,v) => (java2scalaRec(k),java2scalaRec(v))}
-      case _ : clojure.lang.IPersistentSet => expr.asInstanceOf[java.util.Set[Expr]].asScala.toSet.asInstanceOf[Set[Expr]].map(subexp => java2scalaRec(subexp))
-      case _ : java.util.List[Expr @unchecked] => expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp))
+      case _ : clojure.lang.IPersistentMap => EdnMap(expr.asInstanceOf[java.util.Map[Expr,Expr]].asScala.toMap.map{case (k,v) => (java2scalaRec(k),java2scalaRec(v))})
+      case _ : clojure.lang.IPersistentSet => EdnSet(expr.asInstanceOf[java.util.Set[Expr]].asScala.toSet.asInstanceOf[Set[Expr]].map(subexp => java2scalaRec(subexp)))
+      case _ : java.util.List[Expr @unchecked] => EdnList(expr.asInstanceOf[java.util.List[Expr]].asScala.toList.map(subexp => java2scalaRec(subexp)))
       case n : clojure.lang.Ratio => n.numerator.doubleValue() / n.denominator.doubleValue()
       case u : java.util.UUID => u
       case n: Number => n
