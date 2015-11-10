@@ -9,7 +9,7 @@ import java.util.UUID
  * Created by cab on 03/10/2015.
  */
 
-class EdnParserTest extends FreeSpec with Matchers {
+class ParserTest extends FreeSpec with Matchers {
   "Read Edn list" in {
     parse("(1 2 3)") should be(EdnList(List(1,2,3)))
   }
@@ -69,6 +69,8 @@ class EdnParserTest extends FreeSpec with Matchers {
   "Lists" in {
     parse("()") shouldBe EdnList(List())
     parse("(1 2 3)") shouldBe EdnList(List(1, 2, 3))
+  //todo implement with-meta
+  //  parse("(with-meta {:doc \"A list\"} (1 2 3))") shouldBe EdnList(List(1, 2, 3), Map(EdnKeyword("doc")->"A list"))
   }
 
   "Vectors" in {
