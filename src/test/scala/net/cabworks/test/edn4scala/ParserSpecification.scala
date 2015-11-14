@@ -50,7 +50,7 @@ object ParserSpecification extends  Properties("EdnParser") {
     }
    }
   }
-  
+
   property("Symbols") = forAll( Gen.identifier) { s =>
     EdnParser.readEdnString(s) match {
       case EdnSymbol(ns, s, _) => true
