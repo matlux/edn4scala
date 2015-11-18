@@ -43,7 +43,6 @@ object ParserSpecification extends  Properties("EdnParser") {
 
   property("Maps") = forAll { (xs: Map[Int, Int]) => {
     val content = xs.map({ case (k, v) => s"$k $v" }).mkString(" ")
-  //  println("<<<<<<<<<<<<<<" + content)
     val ednStr = s"{$content}"
     EdnParser.readEdnString(ednStr) match {
       case EdnMap(ys, _) => ys == xs
@@ -51,8 +50,6 @@ object ParserSpecification extends  Properties("EdnParser") {
     }
    }
   }
-
-  val symbolNameGen = for { c <- Gen.nonEmptyListOf[Char](Gen.oneOf(Gen.alphaChar, Gen.alphaNumChar))} yield c
 
   property("Symbols") = forAll( Gen.identifier) { s =>
     EdnParser.readEdnString(s) match {
